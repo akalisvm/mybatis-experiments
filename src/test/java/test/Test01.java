@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-public class test01 {
+public class Test01 {
 
     private final String NAMESPACE = "dao.UserMapper";
 
