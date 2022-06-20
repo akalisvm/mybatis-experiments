@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.UserMapper">
+    <cache/>
+
+    <sql id="baseSql">
+        id, user_name userName, real_name realName, password, age, d_id dId
+    </sql>
+
+    <resultMap id="baseMap" type="user">
+        <id column="id" property="id"/>
+        <result column="user_name" property="userName"/>
+        <result column="real_name" property="realName"/>
+        <result column="d_id" property="dId"/>
+    </resultMap>
+
+    <select id="query" resultType="user" resultMap="baseMap">
+        select * from t_user;
+    </select>
+    <select id="queryUserById" resultType="user">
+        select <include refid="baseSql"/> from t_user where id=#{id};
+    </select>
+
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="id" parameterType="user">
+        insert into t_user(user_name, real_name, password, age, d_id)
+        values (#{userName}, #{realName}, #{password}, #{age}, #{dId});
+    </insert>
+
+    <update id="updateUser" parameterType="user">
+        update t_user
+        set user_name=#{userName},
+            real_name=#{realName},
+            password=#{password},
+            age=#{age},
+            d_id=#{dId}
+        where id=#{id};
+    </update>
+
+    <delete id="deleteUser">
+        delete from t_user where id=#{dId};
+    </delete>
+
+    <select id="dynamicQueryWithIf" parameterType="user" resultMap="baseMap">
+        select *
+        from t_user
+        where 1=1
+        <if test="userName != null">
+            and user_name = #{userName}
+        </if>
+    </select>
+
+    <select id="dynamicQueryWithWhere" parameterType="user" resultMap="baseMap">
+        select *
+        from t_user
+        <where>
+            <if test="userName != null">
+                and user_name = #{userName}
+            </if>
+        </where>
+    </select>
+
+    <select id="dynamicQueryWithChoose" parameterType="user" resultMap="baseMap">
+        select *
+        from t_user
+        where 1=1
+        <choose>
+            <when test="userName != null">
+                and user_name = #{userName}
+            </when>
+            <when test="realName != null">
+                and real_name = #{realName}
+            </when>
+            <otherwise>
+                order by id desc
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="dynamicQueryWithTrim" parameterType="user" resultMap="baseMap">
+        select *
+        from t_user
+        <trim prefix="where" prefixOverrides="AND | OR">
+            <if test="userName != null">
+                and user_name = #{userName}
+            </if>
+        </trim>
+    </select>
+
+    <select id="dynamicQueryWithBind" parameterType="user" resultMap="baseMap">
+        <bind name="usernameLike" value="'%' + _parameter.getUserName() + '%'"/>
+        select *
+        from t_user
+        where 1=1
+        <if test="userName != null">
+            and user_name like #{usernameLike}
+        </if>
+    </select>
+
+    <select id="dynamicQueryWithForEach" parameterType="user" resultMap="baseMap">
+        select *
+        from t_user
+        where 1=1
+        <if test="ids != null">
+            and id in
+            <foreach collection="ids" open="(" close=")" separator="," item="id">
+                #{id}
+            </foreach>
+        </if>
+    </select>
+
+    <update id="dynamicUpdateWithSet" parameterType="user">
+        update t_user
+        <set>
+            <if test="userName != null">
+                user_name = #{userName},
+            </if>
+            <if test="realName != null">
+                real_name = #{realName},
+            </if>
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="age != null">
+                age = #{age},
+            </if>
+            <if test="dId != null">
+                d_id = #{dId}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="dynamicUpdateWithTrim" parameterType="user">
+        update t_user
+        <trim prefix="set" suffixOverrides=",">
+            <if test="userName != null">
+                user_name = #{userName},
+            </if>
+            <if test="realName != null">
+                real_name = #{realName},
+            </if>
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="age != null">
+                age = #{age},
+            </if>
+            <if test="dId != null">
+                d_id = #{dId}
+            </if>
+        </trim>
+        where id = #{id}
+    </update>
+
+</mapper>
